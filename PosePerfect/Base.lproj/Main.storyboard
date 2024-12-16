@@ -16,18 +16,32 @@
                         <rect key="frame" x="0.0" y="0.0" width="393" height="852"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
-                            <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="K2F-sP-z1W">
-                                <rect key="frame" x="138" y="409" width="117" height="35"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="K2F-sP-z1W">
+                                <rect key="frame" x="138" y="409" width="117" height="34"/>
                                 <state key="normal" title="Button"/>
                                 <buttonConfiguration key="configuration" style="filled" title="Open game "/>
                                 <connections>
                                     <segue destination="RWA-vc-JsP" kind="show" id="gAr-CF-ZZx"/>
                                 </connections>
                             </button>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="M3l-8u-vhS">
+                                <rect key="frame" x="117.66666666666669" y="593" width="158" height="35"/>
+                                <state key="normal" title="Button"/>
+                                <buttonConfiguration key="configuration" style="filled" title="coremotion game"/>
+                                <connections>
+                                    <segue destination="BMo-Ut-Vlf" kind="show" id="LUJ-4U-nhF"/>
+                                </connections>
+                            </button>
                         </subviews>
                         <viewLayoutGuide key="safeArea" id="6Tk-OE-BBY"/>
                         <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                        <constraints>
+                            <constraint firstItem="6Tk-OE-BBY" firstAttribute="bottom" secondItem="M3l-8u-vhS" secondAttribute="bottom" constant="190" id="1Tn-Vb-j0x"/>
+                            <constraint firstItem="M3l-8u-vhS" firstAttribute="centerX" secondItem="K2F-sP-z1W" secondAttribute="centerX" id="A2o-V4-W0D"/>
+                            <constraint firstItem="K2F-sP-z1W" firstAttribute="top" secondItem="6Tk-OE-BBY" secondAttribute="top" constant="350" id="AZc-Fh-Po4"/>
+                            <constraint firstItem="M3l-8u-vhS" firstAttribute="centerX" secondItem="8bC-Xf-vdC" secondAttribute="centerX" id="GZi-UL-v32"/>
+                            <constraint firstItem="K2F-sP-z1W" firstAttribute="centerY" secondItem="8bC-Xf-vdC" secondAttribute="centerY" id="sA0-pH-eaf"/>
+                        </constraints>
                     </view>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="dkx-z0-nzr" sceneMemberID="firstResponder"/>
@@ -76,6 +90,50 @@
                 <placeholder placeholderIdentifier="IBFirstResponder" id="lH0-lB-bEc" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>
             <point key="canvasLocation" x="951.90839694656484" y="-27.464788732394368"/>
+        </scene>
+        <!--Game Scene-->
+        <scene sceneID="CaX-5g-Upx">
+            <objects>
+                <viewController id="BMo-Ut-Vlf" customClass="GameScene" customModule="PosePerfect" customModuleProvider="target" sceneMemberID="viewController">
+                    <view key="view" contentMode="scaleToFill" id="qC8-4u-dD3">
+                        <rect key="frame" x="0.0" y="0.0" width="393" height="842"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" text="Points: 15" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="8xN-TL-5vk" customClass="PointsLabel">
+                                <rect key="frame" x="29" y="121" width="190" height="27"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="22"/>
+                                <color key="textColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                <nil key="highlightedColor"/>
+                            </label>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" text="Announcement Label" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="eRG-kT-0hu" customClass="AnnoucementLabel">
+                                <rect key="frame" x="23" y="197" width="347" height="46"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="38"/>
+                                <color key="textColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                <nil key="highlightedColor"/>
+                            </label>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" text="Stats" textAlignment="center" lineBreakMode="wordWrap" numberOfLines="5" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="fTO-E6-RF3" customClass="StatsLabel">
+                                <rect key="frame" x="29" y="251" width="341" height="202"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="22"/>
+                                <color key="textColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                <nil key="highlightedColor"/>
+                            </label>
+                        </subviews>
+                        <viewLayoutGuide key="safeArea" id="rzc-3l-yLP"/>
+                        <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                    </view>
+                    <navigationItem key="navigationItem" id="cbr-NX-N5Y"/>
+                    <connections>
+                        <outlet property="annoucementLabel" destination="eRG-kT-0hu" id="UPg-pO-mKh"/>
+                        <outlet property="pointsLabel" destination="8xN-TL-5vk" id="92m-IM-UeY"/>
+                        <outlet property="statsLabel" destination="fTO-E6-RF3" id="Vki-cw-qze"/>
+                    </connections>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="Buy-ZK-MID" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="131" y="733"/>
         </scene>
     </scenes>
     <resources>
