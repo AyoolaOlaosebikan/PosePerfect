@@ -37,23 +37,35 @@
         <!--Game View Controller-->
         <scene sceneID="XU2-o5-syh">
             <objects>
-                <placeholder placeholderIdentifier="IBFirstResponder" id="lH0-lB-bEc" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
                 <viewController id="RWA-vc-JsP" customClass="GameViewController" customModule="PosePerfect" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="spp-My-bkd">
                         <rect key="frame" x="0.0" y="0.0" width="393" height="842"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
-                            <view contentMode="scaleToFill" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Qkk-lV-pDR">
+                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="Qkk-lV-pDR">
                                 <rect key="frame" x="0.0" y="0.0" width="393" height="842"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                 <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                             </view>
                             <sceneKitView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" id="19f-Lq-N6c">
-                                <rect key="frame" x="0.0" y="297" width="393" height="247"/>
+                                <rect key="frame" x="0.0" y="55" width="393" height="560"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                             </sceneKitView>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="aXY-Qv-hrv">
+                                <rect key="frame" x="161" y="723" width="71" height="36"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="30"/>
+                                <nil key="textColor"/>
+                                <nil key="highlightedColor"/>
+                            </label>
                         </subviews>
                         <viewLayoutGuide key="safeArea" id="AD8-0w-eTX"/>
+                        <constraints>
+                            <constraint firstItem="Qkk-lV-pDR" firstAttribute="trailing" secondItem="19f-Lq-N6c" secondAttribute="trailing" id="Lq9-Vi-B7T"/>
+                            <constraint firstItem="Qkk-lV-pDR" firstAttribute="leading" secondItem="19f-Lq-N6c" secondAttribute="leading" id="kbi-BH-mI4"/>
+                            <constraint firstItem="Qkk-lV-pDR" firstAttribute="top" secondItem="AD8-0w-eTX" secondAttribute="top" id="o4D-7T-obw"/>
+                            <constraint firstItem="aXY-Qv-hrv" firstAttribute="centerX" secondItem="19f-Lq-N6c" secondAttribute="centerX" id="tVD-dN-KlH"/>
+                            <constraint firstItem="Qkk-lV-pDR" firstAttribute="bottom" secondItem="AD8-0w-eTX" secondAttribute="bottom" id="v0D-dD-qL8"/>
+                            <constraint firstItem="AD8-0w-eTX" firstAttribute="bottom" secondItem="aXY-Qv-hrv" secondAttribute="bottom" constant="83" id="yVa-Us-g4G"/>
+                        </constraints>
                     </view>
                     <navigationItem key="navigationItem" id="DZj-Rc-yAA"/>
                     <connections>
@@ -61,6 +73,7 @@
                         <outlet property="sceneView" destination="19f-Lq-N6c" id="weT-Mx-1jO"/>
                     </connections>
                 </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="lH0-lB-bEc" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>
             <point key="canvasLocation" x="951.90839694656484" y="-27.464788732394368"/>
         </scene>
