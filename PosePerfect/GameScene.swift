@@ -25,11 +25,12 @@ class GameScene: UIViewController, SCNPhysicsContactDelegate {
     
     let boxGeo = SCNBox(width: 1.0, height: 1.0, length: 1.0, chamferRadius: 0.0)
     let sphereGeo = SCNSphere(radius: 0.5)
-    let planeGeo = SCNPlane(width: 10.0, height: 20.0)
+    let planeWidth: Float = 5.0
+    var planeGeo = SCNPlane(width: 5.0, height: 5.0)
     
     var timeSinceLaunch: Double = 0
     
-    let spawnDist: Float = -30
+    let spawnDist: Float = -50
     let zDeletePos:Float = 5
     var scene: SCNScene = SCNScene(named: "SceneKit Scene.scn") ?? SCNScene()
     let maxXPos: Float = 1.8
@@ -38,22 +39,37 @@ class GameScene: UIViewController, SCNPhysicsContactDelegate {
     
     var redMat: SCNMaterial = SCNMaterial()
     var greenMat: SCNMaterial = SCNMaterial()
+    var glassMat: SCNMaterial = SCNMaterial()
 
     var points: Int = 0
     var totalPointsMissed: Int = 0
     var totalObjectsPassed: Int = 0
     
     var moveAmount: Float = 0.2
-    let moveAmountChange: Float = 0.03
-    var playerSpeed: Float = 0.0
+    let moveAmountChange: Float = 0.02
     
-    var obstacleSpawnTime: Double = 3.0
+    var obstacleSpawnTime: Double = 5.0
     var minObsSpawnTime: Double = 0.2
     let obsSpawnTimeChange: Double = 0.06
+    
+    let tutorialTextTime: Float = 5.0
+    let tutorialShown: Bool = false
     
     func updatePointLabel() {
         DispatchQueue.main.async { [weak self] in
             self?.pointsLabel.text = "\(self?.points ?? 0) Perfect Pose\(self?.points == 1 ? "" : "s")" + String(repeating: "!", count: (self?.points ?? 0) / 5)
+        }
+    }
+    
+    func tutorialText() {
+        DispatchQueue.main.async { [weak self] in
+            self?.statsLabel.text = """
+            You gotta strut your stuff on the red carpet!
+            Do the right pose to fit through the hole.
+            The more holes you pass, the faster you go.
+            Can you pose perfect?
+            Or are you just a poser?
+            """
         }
     }
 
@@ -77,8 +93,11 @@ class GameScene: UIViewController, SCNPhysicsContactDelegate {
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        planeGeo = SCNPlane(width: CGFloat(planeWidth), height: CGFloat(planeWidth))
+        
         updatePointLabel()
         clearLabels()
+        tutorialText()
 
         sceneView = SCNView(frame: self.view.bounds)
         self.view.addSubview(sceneView)
@@ -117,11 +136,13 @@ class GameScene: UIViewController, SCNPhysicsContactDelegate {
         playerNode = scene.rootNode.childNode(withName: "player", recursively: true)
         let redNode = scene.rootNode.childNode(withName: "red", recursively: true)
         let greenNode = scene.rootNode.childNode(withName: "green", recursively: true)
+        let glassNode = scene.rootNode.childNode(withName: "glass", recursively: true)
         redMat = redNode?.geometry?.materials[0] ?? redMat
         greenMat = greenNode?.geometry?.materials[0] ?? greenMat
+        glassMat = glassNode?.geometry?.materials[0] ?? glassMat
         
         // Create a box
-        let planeNode = createPlaneNode(0, 0, spawnDist)
+        let planeNode = createPlaneNode(0, planeWidth/2, spawnDist)
         scene.rootNode.addChildNode(planeNode)
         trackArray.append(planeNode)
         
@@ -185,8 +206,22 @@ class GameScene: UIViewController, SCNPhysicsContactDelegate {
         planeNode.physicsBody?.collisionBitMask = PhysicsCategory.player
         planeNode.physicsBody?.contactTestBitMask = PhysicsCategory.player
         
+        // todo add variants
+        if let maskImage = UIImage(named: "test.png") {
+            let material = glassMat
+            material.diffuse.contents = maskImage
+            material.transparent.contents = maskImage
+            material.blendMode = .alpha
+            material.transparencyMode = .rgbZero
+            
+            // Apply the material to the plane
+            planeNode.geometry?.materials = [material].compactMap { $0 }
+        } else {
+            planeNode.geometry?.materials = [glassMat].compactMap { $0 }
+        }
+        
         // Assign the material
-        planeNode.geometry?.materials = [redMat].compactMap { $0 }
+        
         
         trackArray.append(planeNode)
         return planeNode
@@ -216,8 +251,8 @@ class GameScene: UIViewController, SCNPhysicsContactDelegate {
         if (obj.physicsBody?.categoryBitMask == PhysicsCategory.box) {
             // if (poseMatches) do stuff
             // else
-            triggerGameOver()
-            return
+//            triggerGameOver()
+//            return
             
             points += 1
             updatePointLabel()
@@ -247,6 +282,10 @@ class GameScene: UIViewController, SCNPhysicsContactDelegate {
                 
                 self.updatePlayerPosition(gravity: data.gravity)
                 self.manageTrackObjects()
+                
+                if (!tutorialShown && (timeSinceLaunch > Double(tutorialTextTime))) {
+                    clearLabels()
+                }
             }
         }
     }
@@ -270,15 +309,13 @@ class GameScene: UIViewController, SCNPhysicsContactDelegate {
             // Check if enough time has passed to spawn an obstacle
             if time - lastObstacleSpawnTime >= obstacleSpawnTime {
                 lastObstacleSpawnTime = time // Update last spawn time
-                let planeNode = createPlaneNode(0.0, 0, spawnDist)
+                let planeNode = createPlaneNode(0.0, planeWidth/2, spawnDist)
                 scene.rootNode.addChildNode(planeNode)
                 
                 obstacleSpawnTime = max(obstacleSpawnTime - obsSpawnTimeChange, minObsSpawnTime)
                 print ("Obstacle Spawn Time is now \(obstacleSpawnTime)")
             }
         }
-        
-        
     }
     
     func manageTrackObjects() {
