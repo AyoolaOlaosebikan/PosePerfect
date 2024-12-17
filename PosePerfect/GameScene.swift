@@ -15,7 +15,8 @@ class GameScene: UIViewController, SCNPhysicsContactDelegate, AVCaptureVideoData
     @IBOutlet var pointsLabel: UILabel!
     @IBOutlet var annoucementLabel: UILabel!
     @IBOutlet var statsLabel: UILabel!
-
+    @IBOutlet weak var poseInfoLabel: UILabel!
+    
     @IBOutlet var cameraBackgroundView: UIView!
     @IBOutlet var sceneView: SCNView!
 
@@ -25,6 +26,7 @@ class GameScene: UIViewController, SCNPhysicsContactDelegate, AVCaptureVideoData
 
     var playerNode: SCNNode!
     let motionManager = CMMotionManager()
+    var figureNode: SCNNode!
 
     //var trackArray: [SCNNode] = []
     var currentObstacleNode: SCNNode?
@@ -148,7 +150,6 @@ class GameScene: UIViewController, SCNPhysicsContactDelegate, AVCaptureVideoData
 //        ])
 
         labelContainer.addSubview(pointsLabel)
-        labelContainer.addSubview(statsLabel)
         labelContainer.addSubview(annoucementLabel)
 
         setupScene() // Pass the loaded scene to setupScene
@@ -260,6 +261,12 @@ class GameScene: UIViewController, SCNPhysicsContactDelegate, AVCaptureVideoData
         scene.physicsWorld.contactDelegate = self
 
         playerNode = scene.rootNode.childNode(withName: "player", recursively: true)
+        if let modelScene = SCNScene(named: "The_Chosen_One_Animator_VS_Animation.usdz"),
+           let figureNode = modelScene.rootNode.childNodes.first {
+            figureNode.position = SCNVector3(0, 2, 0) // Set position
+            figureNode.scale = SCNVector3(0.06, 0.06, 0.06) // Adjust scale if needed
+            scene.rootNode.addChildNode(figureNode)
+        }
         let redNode = scene.rootNode.childNode(withName: "red", recursively: true)
         let greenNode = scene.rootNode.childNode(withName: "green", recursively: true)
         let glassNode = scene.rootNode.childNode(withName: "glass", recursively: true)
@@ -287,6 +294,7 @@ class GameScene: UIViewController, SCNPhysicsContactDelegate, AVCaptureVideoData
         planeNode.physicsBody = SCNPhysicsBody(type: .kinematic, shape: nil)
         planeNode.physicsBody?.isAffectedByGravity = false
         planeNode.name = "obstacle"
+        planeNode.scale = SCNVector3(4.0, 4.0, 1.0)
 
         planeNode.physicsBody?.categoryBitMask = PhysicsCategory.box
         planeNode.physicsBody?.collisionBitMask = PhysicsCategory.player
@@ -414,7 +422,7 @@ class GameScene: UIViewController, SCNPhysicsContactDelegate, AVCaptureVideoData
     func generateTrackObject() {
         let randomPoseKey = targetPoses.keys.randomElement() ?? "front_biceps"
         currentPoseKey = randomPoseKey // Update currentPoseKey for consistency
-        let planeNode = createPlaneNode(0, planeWidth / 2, spawnDist, randomPoseKey: randomPoseKey)
+        let planeNode = createPlaneNode(0, 7, spawnDist, randomPoseKey: randomPoseKey)
         scene.rootNode.addChildNode(planeNode)
         currentObstacleNode = planeNode
         //trackArray.append(planeNode)
@@ -424,6 +432,11 @@ class GameScene: UIViewController, SCNPhysicsContactDelegate, AVCaptureVideoData
         // Move the current cutout forward
         //print("here")
         currentObstacleNode?.position.z += moveAmount
+        
+        if (currentObstacleNode?.position.z)! >= -10 {
+            currentObstacleNode?.scale = SCNVector3(2.0,2.0,1.0)
+            currentObstacleNode?.position = SCNVector3(0, 4, (currentObstacleNode?.position.z)!)
+        }
 
         // Check if the cutout passed the player
         if let cutout = currentObstacleNode, cutout.position.z >= zDeletePos {
@@ -469,11 +482,14 @@ extension GameScene {
                     DispatchQueue.main.async {
                         self.currentPoseObservation = firstPose
                         self.analyzePose(from: firstPose)
+                        self.poseInfoLabel.isHidden = true
                     }
                 } else {
                     DispatchQueue.main.async {
                         self.currentPoseObservation = nil
-                        print("No pose detected.")
+                        //print("No pose detected.")
+                        self.poseInfoLabel.isHidden = false
+                        self.poseInfoLabel.text = "No pose detected. Put your entire body into the frame of the camera."
                     }
                 }
             } catch {

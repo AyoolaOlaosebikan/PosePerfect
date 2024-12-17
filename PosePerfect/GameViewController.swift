@@ -14,9 +14,17 @@ class GameViewController: UIViewController, AVCaptureVideoDataOutputSampleBuffer
     @IBOutlet var cameraBackgroundView: UIView!
     @IBOutlet var sceneView: SCNView!
 
+    @IBAction func resetPose(_ sender: UIButton) {
+        startTraining(for: currentPoseKey)
+    }
+    
     var captureSession: AVCaptureSession!
 
     var isPoseMatchedBool: Bool = false
+    
+    var trainingTimer: Timer?
+    
+    var isViewActive: Bool = false
 
     let targetPoses: [String: [String: Double]] = [
         "front_biceps": ["LeftArmAngle": -150, "RightArmAngle": 150],
@@ -35,12 +43,8 @@ class GameViewController: UIViewController, AVCaptureVideoDataOutputSampleBuffer
     @IBOutlet var infoLabel: UILabel!
 
     override func viewDidLoad() {
-        setupCamera()
-        setupScene()
-
-        Timer.scheduledTimer(withTimeInterval: 0.02, repeats: true) { _ in
-            self.updateGame()
-        }
+        showPoseSelectionMenu()
+        
     }
 
     func setupCamera() {
@@ -75,121 +79,150 @@ class GameViewController: UIViewController, AVCaptureVideoDataOutputSampleBuffer
         }
     }
 
+    func showPoseSelectionMenu() {
+        let alert = UIAlertController(title: "Select a Pose", message: "Choose a pose to practice", preferredStyle: .alert)
+        
+        for poseKey in targetPoses.keys {
+            alert.addAction(UIAlertAction(title: poseKey, style: .default, handler: { _ in
+                self.startTraining(for: poseKey)
+            }))
+        }
+        
+        alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: nil))
+        present(alert, animated: true, completion: nil)
+    }
+    
     func setupScene() {
         let scene = SCNScene()
-        sceneView.scene = scene
-        sceneView.allowsCameraControl = false
-        sceneView.backgroundColor = .clear
+               sceneView.scene = scene
+               sceneView.allowsCameraControl = false
+               sceneView.backgroundColor = .clear
 
-        // Add a camera
-        let cameraNode = SCNNode()
-        cameraNode.camera = SCNCamera()
-        cameraNode.position = SCNVector3(0, 0, 5) // Start position
-        cameraNode.eulerAngles = SCNVector3(-Float.pi / 8, 0, 0) // Tilt downward
-        scene.rootNode.addChildNode(cameraNode)
+               // Add a camera
+               let cameraNode = SCNNode()
+               cameraNode.camera = SCNCamera()
+               cameraNode.position = SCNVector3(0, 0, 5) // Start position
+               cameraNode.eulerAngles = SCNVector3(-Float.pi / 8, 0, 0) // Tilt downward
+               scene.rootNode.addChildNode(cameraNode)
 
-//        let platformWidth: CGFloat = 5.0 // Adjust to control the size of the platform
-//        let platformLength: CGFloat = 10.0 // Length of the platform
-//
-//        // Create the platform geometry
-//        let platformNode = SCNNode(geometry: SCNPlane(width: platformWidth, height: platformLength))
-//        platformNode.geometry?.firstMaterial?.diffuse.contents = UIImage(named: "grassTexture.png") // Apply a grass texture
-//        platformNode.geometry?.firstMaterial?.isDoubleSided = true // Make sure it's visible from all angles
-//
-//        // Rotate the plane to make it horizontal
-//        platformNode.eulerAngles = SCNVector3(-Float.pi / 4, 0, -Float.pi / 8)
-//        // Position the platform slightly below the cutout
-//        platformNode.position = SCNVector3(0.5, -2, -2) // Adjust `y` to lower the platform and `z` for alignment
-//        scene.rootNode.addChildNode(platformNode)
+       //        let platformWidth: CGFloat = 5.0 // Adjust to control the size of the platform
+       //        let platformLength: CGFloat = 10.0 // Length of the platform
+       //
+       //        // Create the platform geometry
+       //        let platformNode = SCNNode(geometry: SCNPlane(width: platformWidth, height: platformLength))
+       //        platformNode.geometry?.firstMaterial?.diffuse.contents = UIImage(named: "grassTexture.png") // Apply a grass texture
+       //        platformNode.geometry?.firstMaterial?.isDoubleSided = true // Make sure it's visible from all angles
+       //
+       //        // Rotate the plane to make it horizontal
+       //        platformNode.eulerAngles = SCNVector3(-Float.pi / 4, 0, -Float.pi / 8)
+       //        // Position the platform slightly below the cutout
+       //        platformNode.position = SCNVector3(0.5, -2, -2) // Adjust y to lower the platform and z for alignment
+       //        scene.rootNode.addChildNode(platformNode)
 
-        ////
-//        let outlineNode = SCNNode(geometry: SCNBox(width: platformWidth + 0.01,
-//                                                   height: platformHeight + 0.01,
-//                                                   length: 20.2,
-//                                                   chamferRadius: 0))
-//        outlineNode.geometry?.firstMaterial?.diffuse.contents = UIColor.black // Outline color
-//        outlineNode.geometry?.firstMaterial?.fillMode = .lines // Render as wireframe
-//        outlineNode.position = platformNode.position // Match position
-//        outlineNode.eulerAngles = platformNode.eulerAngles
-//        scene.rootNode.addChildNode(outlineNode)
+               ////
+       //        let outlineNode = SCNNode(geometry: SCNBox(width: platformWidth + 0.01,
+       //                                                   height: platformHeight + 0.01,
+       //                                                   length: 20.2,
+       //                                                   chamferRadius: 0))
+       //        outlineNode.geometry?.firstMaterial?.diffuse.contents = UIColor.black // Outline color
+       //        outlineNode.geometry?.firstMaterial?.fillMode = .lines // Render as wireframe
+       //        outlineNode.position = platformNode.position // Match position
+       //        outlineNode.eulerAngles = platformNode.eulerAngles
+       //        scene.rootNode.addChildNode(outlineNode)
 
-        // Add a placeholder for the pose cutout
-        let poseCutoutNode = SCNNode(geometry: SCNPlane(width: 2, height: 3))
-        poseCutoutNode.geometry?.firstMaterial?.diffuse.contents = UIImage(named: "front_biceps.png")
-        poseCutoutNode.position = SCNVector3(2, 0, -2)
-        poseCutoutNode.name = "PoseCutout"
-        scene.rootNode.addChildNode(poseCutoutNode)
-    }
-
-    func updateGame() {
-        guard let poseCutoutNode = sceneView.scene?.rootNode.childNode(withName: "PoseCutout", recursively: true) else { return }
-        guard let currentPoseObservation = currentPoseObservation else {
-               print("No pose detected. Keeping cutout stationary.")
-               return
+               // Add a placeholder for the pose cutout
+               let poseCutoutNode = SCNNode(geometry: SCNPlane(width: 2, height: 3))
+               poseCutoutNode.geometry?.firstMaterial?.diffuse.contents = UIImage(named: "front_biceps.png")
+               poseCutoutNode.position = SCNVector3(2, 0, -2)
+               poseCutoutNode.name = "PoseCutout"
+               scene.rootNode.addChildNode(poseCutoutNode)
+        
+        print("PoseCutoutNode added at position: \(poseCutoutNode.position)")
+            print("Scene children count: \(scene.rootNode.childNodes.count)")
            }
 
+    func updateTrainingMode() {
+        guard let poseCutoutNode = sceneView.scene?.rootNode.childNode(withName: "PoseCutout", recursively: true),
+              let currentPoseObservation = currentPoseObservation else {
+            print("No pose detected. Keeping cutout stationary.")
+            return
+            
+        }
+            
         poseCutoutNode.position.z += 0.012
-        poseCutoutNode.position.x -= 0.012
-       // if let currentPoseObservation = currentPoseObservation {
-        
-        
-            // print("we here")
-            let detectedFeatures = extractFeatures(from: currentPoseObservation)
-           //print("Current Pose Key: \(currentPoseKey)")
-            if let targetPose = targetPoses[currentPoseKey] {
-               // print("in there")
-                if isPoseMatched(detectedFeatures: detectedFeatures, targetPose: targetPose) {
-                    // Move the cutout closer
-                    isPoseMatchedBool = true
-                    print("Pose matched! Moving cutout.")
-                } else {
-                    //                    poseCutoutNode.position.z -= 0.1
-                    //                    poseCutoutNode.position.x -= 0.1
-                    isPoseMatchedBool = false
-                    print("Pose not matched. Try again.")
-            //    }
-            }
-        }
+                poseCutoutNode.position.x -= 0.012
+        let detectedFeatures = extractFeatures(from: currentPoseObservation)
 
-        // Reset position or advance to next level
-        if poseCutoutNode.position.z > 0.2 {
-            if isPoseMatchedBool {
-                if poseCutoutNode.position.z > 1 {
-                    resetCutoutPosition(poseCutoutNode)
-                }
+        if let targetPose = targetPoses[currentPoseKey] {
+            if isPoseMatched(detectedFeatures: detectedFeatures, targetPose: targetPose) {
+                isPoseMatchedBool = true
+                infoLabel.text = "Pose Matched! Great Job!"
+                infoLabel.textColor = .green
             } else {
-                poseCutoutNode.position.z -= 0.9
-                poseCutoutNode.position.x += 0.9
+                infoLabel.text = "Pose Not Matched. Try Again!"
+                isPoseMatchedBool = false
+                infoLabel.textColor = .red
             }
         }
+        if poseCutoutNode.position.z > 0.2 {
+                    if isPoseMatchedBool {
+                        if poseCutoutNode.position.z > 1 {
+                            resetCutoutPosition(poseCutoutNode)
+                        }
+                    } else {
+                        poseCutoutNode.position.z -= 0.9
+                        poseCutoutNode.position.x += 0.9
+                    }
+                }
     }
+    
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+        sceneView.scene?.rootNode.childNodes.forEach { $0.removeFromParentNode() }
+            print("Scene nodes removed.")
 
-    var frameCounter = 0
-    func captureOutput(_ output: AVCaptureOutput, didOutput sampleBuffer: CMSampleBuffer, from connection: AVCaptureConnection) {
-        frameCounter += 1
-        if frameCounter % 10 == 0 {
-            guard let pixelBuffer = CMSampleBufferGetImageBuffer(sampleBuffer) else { return }
-            processImage(pixelBuffer)
-        }
+            // Stop camera and timer
+            if captureSession?.isRunning == true {
+                captureSession.stopRunning()
+            }
+            captureSession = nil
+            trainingTimer?.invalidate()
+            trainingTimer = nil
     }
 
     func resetCutoutPosition(_ node: SCNNode) {
-        node.position = SCNVector3(2, 0, -2)
-        //  print("New pose challenge! Position reset.")
+            node.position = SCNVector3(2, 0, -2)
+            //  print("New pose challenge! Position reset.")
 
-        var newPoseKey: String
-        repeat {
-            newPoseKey = targetPoses.keys.randomElement() ?? "front_biceps"
-        } while newPoseKey == previousPoseKey
-
-        // Update the cutout with the new pose
-        if let newPose = targetPoses[newPoseKey] {
-            //  print("New pose challenge: \(newPoseKey)")
-            currentPoseKey = newPoseKey
-            previousPoseKey = newPoseKey // Update the previous pose
-            node.geometry?.firstMaterial?.diffuse.contents = UIImage(named: "\(newPoseKey).png") // Update the image
-            isPoseMatchedBool = false // Reset pose matching state
+           
         }
+    var frameCounter = 0
+    func captureOutput(_ output: AVCaptureOutput, didOutput sampleBuffer: CMSampleBuffer, from connection: AVCaptureConnection) {
+        guard isViewActive else { return } // Skip processing if view is not active
+            frameCounter += 1
+            if frameCounter % 10 == 0 {
+                guard let pixelBuffer = CMSampleBufferGetImageBuffer(sampleBuffer) else { return }
+                processImage(pixelBuffer)
+            }
+    }
+
+    func startTraining(for poseKey: String) {
+        currentPoseKey = poseKey // Set the pose to practice
+        previousPoseKey = poseKey // Update previous pose
+        
+        setupCamera()
+        setupScene()
+        trainingTimer = Timer.scheduledTimer(withTimeInterval: 0.02, repeats: true) { _ in
+            self.updateTrainingMode()
+        }
+
+        if let poseCutoutNode = sceneView.scene?.rootNode.childNode(withName: "PoseCutout", recursively: true) {
+            poseCutoutNode.geometry?.firstMaterial?.diffuse.contents = UIImage(named: "\(poseKey).png") // Update cutout image
+            poseCutoutNode.position = SCNVector3(2, 0, -2) // Reset position
+            print("Training started for pose: \(poseKey)")
+        }
+        
+        infoLabel.text = "Practice Pose: \(poseKey.capitalized)" // Update the info label
     }
 
     func isPoseMatched(detectedFeatures: [String: Double], targetPose: [String: Double]) -> Bool {
