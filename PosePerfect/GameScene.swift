@@ -25,6 +25,7 @@ class GameScene: UIViewController, SCNPhysicsContactDelegate {
     
     let boxGeo = SCNBox(width: 1.0, height: 1.0, length: 1.0, chamferRadius: 0.0)
     let sphereGeo = SCNSphere(radius: 0.5)
+    let planeGeo = SCNPlane(width: 10.0, height: 20.0)
     
     var timeSinceLaunch: Double = 0
     
@@ -44,6 +45,7 @@ class GameScene: UIViewController, SCNPhysicsContactDelegate {
     
     var moveAmount: Float = 0.2
     let moveAmountChange: Float = 0.03
+    var playerSpeed: Float = 0.0
     
     var obstacleSpawnTime: Double = 3.0
     var minObsSpawnTime: Double = 0.2
@@ -51,7 +53,7 @@ class GameScene: UIViewController, SCNPhysicsContactDelegate {
     
     func updatePointLabel() {
         DispatchQueue.main.async { [weak self] in
-            self?.pointsLabel.text = "Points: \(self?.points ?? 0)"
+            self?.pointsLabel.text = "\(self?.points ?? 0) Perfect Pose\(self?.points == 1 ? "" : "s")" + String(repeating: "!", count: (self?.points ?? 0) / 5)
         }
     }
 
@@ -66,10 +68,8 @@ class GameScene: UIViewController, SCNPhysicsContactDelegate {
         DispatchQueue.main.async { [weak self] in
             self?.annoucementLabel.text = "You crashed!"
             self?.statsLabel.text = """
-            Points Earned: \(self?.points ?? 0)
-            Points Missed: \(self?.totalPointsMissed ?? 0)
-            Obstacles Dodged: \(self?.totalObjectsPassed ?? 0)
-            Total Time Survived: \(String(format: "%.2f", self?.timeSinceLaunch ?? 0)) seconds
+            Number of Perfect Poses: \(self?.totalObjectsPassed ?? 0)
+            Total Posing Time: \(String(format: "%.2f", self?.timeSinceLaunch ?? 0)) seconds
             """
         }
     }
@@ -121,9 +121,9 @@ class GameScene: UIViewController, SCNPhysicsContactDelegate {
         greenMat = greenNode?.geometry?.materials[0] ?? greenMat
         
         // Create a box
-        let boxNode = createBoxNode(0, 0, spawnDist)
-        scene.rootNode.addChildNode(boxNode)
-        trackArray.append(boxNode)
+        let planeNode = createPlaneNode(0, 0, spawnDist)
+        scene.rootNode.addChildNode(planeNode)
+        trackArray.append(planeNode)
         
         print("Obstacle Array Count: \(self.trackArray.count)")
         if let playerNode = self.playerNode {
@@ -173,6 +173,25 @@ class GameScene: UIViewController, SCNPhysicsContactDelegate {
         return sphereNode
     }
     
+    func createPlaneNode(_ x: Float, _ y: Float, _ z: Float) -> SCNNode {
+        let planeNode = SCNNode(geometry: planeGeo)
+        planeNode.position = SCNVector3(x, y, z)
+        planeNode.rotation = SCNVector4(0.0, 90.0, 0.0, 0.0)
+        planeNode.physicsBody = SCNPhysicsBody(type: .kinematic, shape: nil)
+        planeNode.physicsBody?.isAffectedByGravity = false
+        planeNode.name = "obstacle"
+        
+        planeNode.physicsBody?.categoryBitMask = PhysicsCategory.box
+        planeNode.physicsBody?.collisionBitMask = PhysicsCategory.player
+        planeNode.physicsBody?.contactTestBitMask = PhysicsCategory.player
+        
+        // Assign the material
+        planeNode.geometry?.materials = [redMat].compactMap { $0 }
+        
+        trackArray.append(planeNode)
+        return planeNode
+    }
+    
     struct PhysicsCategory {
         static let player: Int = 1 << 0    // 1 (binary: 0001)
         static let box: Int = 1 << 1       // 2 (binary: 0010)
@@ -195,11 +214,12 @@ class GameScene: UIViewController, SCNPhysicsContactDelegate {
         }
         
         if (obj.physicsBody?.categoryBitMask == PhysicsCategory.box) {
-            showEndLabels()
-            motionManager.stopDeviceMotionUpdates()
-        } else if (obj.physicsBody?.categoryBitMask == PhysicsCategory.sphere) {
+            // if (poseMatches) do stuff
+            // else
+            triggerGameOver()
+            return
+            
             points += 1
-            //print("Points are now \(points)")
             updatePointLabel()
         }
         
@@ -210,6 +230,11 @@ class GameScene: UIViewController, SCNPhysicsContactDelegate {
         
         // Handle collision
         //print("Collision detected between \(nodeA.name ?? "NodeA") and \(nodeB.name ?? "NodeB")")
+    }
+    
+    func triggerGameOver() {
+        showEndLabels()
+        motionManager.stopDeviceMotionUpdates()
     }
     
     func startMotionUpdates() {
@@ -235,9 +260,9 @@ class GameScene: UIViewController, SCNPhysicsContactDelegate {
         // Check if enough time has passed to spawn a point
         if time - lastPointSpawnTime >= pointSpawnTime {
             lastPointSpawnTime = time // Update last spawn time
-            let xDist = Float.random(in: -1.0 * maxXPos...maxXPos)
-            let sphereNode = createSphereNode(xDist, 0, spawnDist)
-            scene.rootNode.addChildNode(sphereNode)
+//            let xDist = Float.random(in: -1.0 * maxXPos...maxXPos)
+//            let sphereNode = createSphereNode(xDist, 0, spawnDist)
+//            scene.rootNode.addChildNode(sphereNode) // spawn point orb
             
             moveAmount += moveAmountChange
             print ("Move Amount is now \(moveAmount)")
@@ -245,12 +270,8 @@ class GameScene: UIViewController, SCNPhysicsContactDelegate {
             // Check if enough time has passed to spawn an obstacle
             if time - lastObstacleSpawnTime >= obstacleSpawnTime {
                 lastObstacleSpawnTime = time // Update last spawn time
-                var newXDist = Float.random(in: -1.0 * maxXPos...maxXPos)
-                while abs(xDist - newXDist) < obsPointMinDist {
-                    newXDist = Float.random(in: -1.0 * maxXPos...maxXPos)
-                }
-                let boxNode = createBoxNode(newXDist, 0, spawnDist)
-                scene.rootNode.addChildNode(boxNode)
+                let planeNode = createPlaneNode(0.0, 0, spawnDist)
+                scene.rootNode.addChildNode(planeNode)
                 
                 obstacleSpawnTime = max(obstacleSpawnTime - obsSpawnTimeChange, minObsSpawnTime)
                 print ("Obstacle Spawn Time is now \(obstacleSpawnTime)")
@@ -281,23 +302,13 @@ class GameScene: UIViewController, SCNPhysicsContactDelegate {
         if (node.physicsBody?.categoryBitMask == 1) {
             totalObjectsPassed += 1
         } else {
-            totalPointsMissed += 1
+//            totalPointsMissed += 1
         }
             
     }
 
     func updatePlayerPosition(gravity: CMAcceleration) {
-        // Map the tilt to a position
-        let tiltFactor: Float = 5.0 // Adjust this factor to control sensitivity
-        var xPosition = Float(gravity.x) * tiltFactor
-        if (abs(xPosition) > maxXPos) {
-            xPosition = maxXPos * xPosition/abs(xPosition)
-        }
-//        let zPosition = Float(gravity.y) * tiltFactor
-        
-        // Update the cube's position
-        playerNode.position = SCNVector3(xPosition, 0, 0)
-        //print("Updated Player Position: (\(xPosition), 0, 0)")
+        // do stuff
     }
     
     func createDefaultMaterial() -> SCNMaterial {
@@ -331,5 +342,4 @@ class GameScene: UIViewController, SCNPhysicsContactDelegate {
     }
 }
 
-// Don't forget to update your Info.plist to allow SceneKit features, if needed.
 

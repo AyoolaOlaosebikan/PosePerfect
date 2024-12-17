@@ -17,17 +17,17 @@
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="K2F-sP-z1W">
-                                <rect key="frame" x="138" y="409" width="117" height="34"/>
+                                <rect key="frame" x="132" y="409" width="129" height="34"/>
                                 <state key="normal" title="Button"/>
-                                <buttonConfiguration key="configuration" style="filled" title="Open game "/>
+                                <buttonConfiguration key="configuration" style="filled" title="Pose Practice"/>
                                 <connections>
                                     <segue destination="RWA-vc-JsP" kind="show" id="gAr-CF-ZZx"/>
                                 </connections>
                             </button>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="M3l-8u-vhS">
-                                <rect key="frame" x="117.66666666666669" y="593" width="158" height="35"/>
+                                <rect key="frame" x="133" y="593" width="127" height="35"/>
                                 <state key="normal" title="Button"/>
-                                <buttonConfiguration key="configuration" style="filled" title="coremotion game"/>
+                                <buttonConfiguration key="configuration" style="filled" title="Pose Perfect!"/>
                                 <connections>
                                     <segue destination="BMo-Ut-Vlf" kind="show" id="LUJ-4U-nhF"/>
                                 </connections>
