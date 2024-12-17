@@ -10,13 +10,13 @@ import UIKit
 import Vision
 import SceneKit
 
-class GameViewController: UIViewController {
+class GameViewController: UIViewController, AVCaptureVideoDataOutputSampleBufferDelegate {
     @IBOutlet var cameraBackgroundView: UIView!
     @IBOutlet var sceneView: SCNView!
 
     var captureSession: AVCaptureSession!
     
-    var isPoseMatched: Bool = true
+    var isPoseMatched: Bool = false
     
     let targetPoses: [String: [String: Double]] = [
         "front_biceps": ["LeftArmAngle": 120, "RightArmAngle": 120],
@@ -29,7 +29,10 @@ class GameViewController: UIViewController {
     var currentPoseObservation: VNHumanBodyPoseObservation?
     
     var previousPoseKey: String? = nil
+    var currentPoseKey: String = "front biceps"
 
+    @IBOutlet weak var infoLabel: UILabel!
+    
     override func viewDidLoad() {
         setupCamera()
         setupScene()
@@ -60,6 +63,12 @@ class GameViewController: UIViewController {
         previewLayer.videoGravity = .resizeAspectFill
         previewLayer.frame = cameraBackgroundView.bounds
         cameraBackgroundView.layer.addSublayer(previewLayer)
+        
+        let videoOutput = AVCaptureVideoDataOutput()
+        videoOutput.setSampleBufferDelegate(self, queue: DispatchQueue(label: "videoQueue"))
+        if captureSession.canAddOutput(videoOutput) {
+            captureSession.addOutput(videoOutput)
+        }
         DispatchQueue.global(qos: .background).async {
             self.captureSession.startRunning()
         }
@@ -91,7 +100,7 @@ class GameViewController: UIViewController {
 //        platformNode.position = SCNVector3(0.5, -2, -2) // Adjust `y` to lower the platform and `z` for alignment
 //        scene.rootNode.addChildNode(platformNode)
 
-////        
+////
 //        let outlineNode = SCNNode(geometry: SCNBox(width: platformWidth + 0.01,
 //                                                   height: platformHeight + 0.01,
 //                                                   length: 20.2,
@@ -119,15 +128,17 @@ class GameViewController: UIViewController {
             poseCutoutNode.position.x -= 0.012
             if let currentPoseObservation = currentPoseObservation {
                 let detectedFeatures = extractFeatures(from: currentPoseObservation)
-                if isPoseMatched(detectedFeatures: detectedFeatures, targetPose: targetPoses["Front Double Biceps"]!) {
-                    // Move the cutout closer
-                   
-                    isPoseMatched = true
-                    print("Pose matched! Moving cutout.")
-                } else {
-//                    poseCutoutNode.position.z -= 0.1
-//                    poseCutoutNode.position.x -= 0.1
-                    print("Pose not matched. Try again.")
+                if let targetPose = targetPoses[currentPoseKey] {
+                    if isPoseMatched(detectedFeatures: detectedFeatures, targetPose: targetPoses["front_biceps"]!) {
+                        // Move the cutout closer
+                        isPoseMatched = true
+                        print("Pose matched! Moving cutout.")
+                    } else {
+                        //                    poseCutoutNode.position.z -= 0.1
+                        //                    poseCutoutNode.position.x -= 0.1
+                        isPoseMatched = false
+                        print("Pose not matched. Try again.")
+                    }
                 }
             }
 
@@ -145,22 +156,32 @@ class GameViewController: UIViewController {
             }
         }
     
+    func captureOutput(_ output: AVCaptureOutput, didOutput sampleBuffer: CMSampleBuffer, from connection: AVCaptureConnection) {
+            guard let pixelBuffer = CMSampleBufferGetImageBuffer(sampleBuffer) else { return }
+            processImage(pixelBuffer)
+        }
+    
     func resetCutoutPosition(_ node: SCNNode) {
         node.position = SCNVector3(2, 0, -2)
-        print("New pose challenge! Position reset.")
+      //  print("New pose challenge! Position reset.")
         
         var newPoseKey: String
         repeat {
-            newPoseKey = targetPoses.keys.randomElement() ?? "defaultPose"
+            newPoseKey = targetPoses.keys.randomElement() ?? "front_biceps"
         } while newPoseKey == previousPoseKey
         
         // Update the cutout with the new pose
         if let newPose = targetPoses[newPoseKey] {
-            print("New pose challenge: \(newPoseKey)")
+          //  print("New pose challenge: \(newPoseKey)")
+            currentPoseKey = newPoseKey
             previousPoseKey = newPoseKey // Update the previous pose
             node.geometry?.firstMaterial?.diffuse.contents = UIImage(named: "\(newPoseKey).png") // Update the image
-            // isPoseMatched = false // Reset pose matching state
+             isPoseMatched = false // Reset pose matching state
         }
+        
+        
+        
+        
     }
 
     
@@ -174,122 +195,67 @@ class GameViewController: UIViewController {
         }
         return true
     }
-    
-//    private func handlePoseObservation(_ observation: VNHumanBodyPoseObservation) {
-//        guard let recognizedPoints = try? observation.recognizedPoints(.all) else { return }
-//        
-//        let leftWrist = recognizedPoints[.leftWrist]
-//        let leftElbow = recognizedPoints[.leftElbow]
-//        let leftShoulder = recognizedPoints[.leftShoulder]
-//
-//        if let wrist = leftWrist?.location,
-//        let elbow = leftElbow?.location,
-//        let shoulder = leftShoulder?.location {
-//        let angle = calculateAngle(pointA: wrist, pointB: elbow, pointC: shoulder)
-//        print("Left Arm Angle: \(angle)°")
-//        }
-//    }
-    
-    
-    func extractFeatures(from observation: VNHumanBodyPoseObservation) -> [String: Double] {
-        var features: [String: Double] = [:]
+}
+
+extension GameViewController {
+    func processImage(_ pixelBuffer: CVPixelBuffer) {
+        // Create the Vision request handler
+        let requestHandler = VNImageRequestHandler(cvPixelBuffer: pixelBuffer, orientation: .up, options: [:])
+
+        // Create the Vision request
+        let request = VNDetectHumanBodyPoseRequest()
 
         do {
-            let points = try observation.recognizedPoints(.all)
-            if let leftElbow = points[.leftElbow], let leftWrist = points[.leftWrist], leftElbow.confidence > 0.5, leftWrist.confidence > 0.5 {
-                features["LeftArmAngle"] = calculateAngle(between: leftElbow, and: leftWrist)
+            // Perform the request
+            try requestHandler.perform([request])
+            if let results = request.results, let firstPose = results.first {
+                self.currentPoseObservation = firstPose
+                analyzePose(from: firstPose)
             }
-            // Add more feature extraction as needed
         } catch {
-            print("Error extracting features: \(error)")
+            print("Error performing Vision request: \(error.localizedDescription)")
         }
-
-        return features
     }
-    
-    func getPoseObservation() -> VNHumanBodyPoseObservation? {
-        // Integrate with Vision pipeline here to get the latest pose
-        // Return a VNHumanBodyPoseObservation or nil if no pose is detected
-        return nil
-    }
-    
 
-//    private func calculateAngle(pointA: CGPoint?, pointB: CGPoint?, pointC: CGPoint?) -> CGFloat {
-//        guard let pointA = pointA, let pointB = pointB, let pointC = pointC else {
-//            print("One or more points are nil")
-//            return 0
-//        }
-//        
-//        let vector1 = CGVector(dx: pointB.x - pointA.x, dy: pointB.y - pointA.y)
-//        let vector2 = CGVector(dx: pointC.x - pointB.x, dy: pointC.y - pointB.y)
-//        let dotProduct = vector1.dx * vector2.dx + vector1.dy * vector2.dy
-//        let magnitude1 = sqrt(vector1.dx * vector1.dx + vector1.dy * vector1.dy)
-//        let magnitude2 = sqrt(vector2.dx * vector2.dx + vector2.dy * vector2.dy)
-//        return acos(dotProduct / (magnitude1 * magnitude2)) * 180 / .pi
-//    }
-    
+    func analyzePose(from observation: VNHumanBodyPoseObservation) {
+        do {
+            let recognizedPoints = try observation.recognizedPoints(.all)
+
+            // Example: Get key joint positions
+            if let leftWrist = recognizedPoints[.leftWrist], leftWrist.confidence > 0.5,
+               let rightWrist = recognizedPoints[.rightWrist], rightWrist.confidence > 0.5 {
+
+                print("Left Wrist: \(leftWrist), Right Wrist: \(rightWrist)")
+
+                // Perform pose-matching logic here
+            }
+        } catch {
+            print("Error analyzing pose: \(error.localizedDescription)")
+        }
+    }
+}
+extension GameViewController {
     func calculateAngle(between point1: VNRecognizedPoint, and point2: VNRecognizedPoint) -> Double {
         let dx = point2.x - point1.x
         let dy = point2.y - point1.y
         return atan2(dy, dx) * 180 / .pi // Convert radians to degrees
     }
-    
-    
-    
-//    private func processImage(_ pixelBuffer: CVPixelBuffer) {
-//        //print("hiiiooo")
-//        let requestHandler = VNImageRequestHandler(cvPixelBuffer: pixelBuffer, orientation: .up, options: [:])
-//        let request = VNDetectHumanBodyPoseRequest()
-//        
-//        do {
-//            try requestHandler.perform([request])
-//            if let results = request.results {
-//               // print("Detected \(results.count) pose(s)")
-//                if let firstPose = results.first {
-//                    currentPoseObservation = firstPose
-//                    guard let poseObservation = currentPoseObservation else {
-//                        //print("why why why why wy")
-//                        return
-//                    }
-//                    let features = extractFeatures(from: poseObservation)
-//                    // predictPose(features: features)
-//                    
-//               //     print("Pose detected: \(firstPose)")
-//                } else {
-//                //    print("No pose in results")
-//                }
-//            } else {
-//               // print("No results from request")
-//            }
-//        } catch {
-//            print("Error detecting pose: \(error)")
-//        }
-//    }
-    
-    func processImage(_ pixelBuffer: CVPixelBuffer) {
-        let requestHandler = VNImageRequestHandler(cvPixelBuffer: pixelBuffer, orientation: .up, options: [:])
-        let request = VNDetectHumanBodyPoseRequest()
+
+    func extractFeatures(from observation: VNHumanBodyPoseObservation) -> [String: Double] {
+        var features: [String: Double] = [:]
 
         do {
-            try requestHandler.perform([request])
-            if let results = request.results as? [VNHumanBodyPoseObservation], let firstPose = results.first {
-                currentPoseObservation = firstPose
+            let points = try observation.recognizedPoints(.all)
+
+            if let leftElbow = points[.leftElbow], let leftWrist = points[.leftWrist], leftElbow.confidence > 0.5, leftWrist.confidence > 0.5 {
+                features["LeftArmAngle"] = calculateAngle(between: leftElbow, and: leftWrist)
             }
+
+            // Add more feature extraction here as needed
         } catch {
-            print("Error detecting pose: \(error)")
+            print("Error extracting features: \(error)")
         }
-    }
-    
-}
-extension GameViewController: AVCaptureVideoDataOutputSampleBufferDelegate {
-    func captureOutput(_ output: AVCaptureOutput, didOutput sampleBuffer: CMSampleBuffer, from connection: AVCaptureConnection) {
-        
-        guard let pixelBuffer = CMSampleBufferGetImageBuffer(sampleBuffer) else {
-            
-            return
-        }
-        
-        processImage(pixelBuffer)
-        //print("process image")
+
+        return features
     }
 }

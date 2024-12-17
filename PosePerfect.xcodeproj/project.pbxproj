@@ -457,7 +457,7 @@
 				CODE_SIGN_ENTITLEMENTS = PosePerfect/PosePerfect.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = 9NGW8KNW93;
+				DEVELOPMENT_TEAM = MJXC97G8VT;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = PosePerfect/Info.plist;
 				INFOPLIST_KEY_NSCameraUsageDescription = "Used to read camera input for the game to see poses";
@@ -471,7 +471,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = hi.PosePerfect2;
+				PRODUCT_BUNDLE_IDENTIFIER = hi.PosePerfect;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
@@ -487,7 +487,7 @@
 				CODE_SIGN_ENTITLEMENTS = PosePerfect/PosePerfect.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = 9NGW8KNW93;
+				DEVELOPMENT_TEAM = MJXC97G8VT;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = PosePerfect/Info.plist;
 				INFOPLIST_KEY_NSCameraUsageDescription = "Used to read camera input for the game to see poses";
@@ -501,7 +501,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = hi.PosePerfect2;
+				PRODUCT_BUNDLE_IDENTIFIER = hi.PosePerfect;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
