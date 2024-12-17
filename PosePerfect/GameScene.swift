@@ -22,6 +22,7 @@ class GameScene: UIViewController, SCNPhysicsContactDelegate {
     let motionManager = CMMotionManager()
     
     var trackArray: [SCNNode] = []
+    var poseArray: [[String : Double]] = []
     
     let boxGeo = SCNBox(width: 1.0, height: 1.0, length: 1.0, chamferRadius: 0.0)
     let sphereGeo = SCNSphere(radius: 0.5)
@@ -54,6 +55,8 @@ class GameScene: UIViewController, SCNPhysicsContactDelegate {
     
     let tutorialTextTime: Float = 5.0
     let tutorialShown: Bool = false
+    
+    let poseDetection: PoseHelper = PoseHelper()
     
     func updatePointLabel() {
         DispatchQueue.main.async { [weak self] in
@@ -92,6 +95,8 @@ class GameScene: UIViewController, SCNPhysicsContactDelegate {
 
     override func viewDidLoad() {
         super.viewDidLoad()
+        
+        poseDetection.start()
         
         planeGeo = SCNPlane(width: CGFloat(planeWidth), height: CGFloat(planeWidth))
         
@@ -156,44 +161,6 @@ class GameScene: UIViewController, SCNPhysicsContactDelegate {
         startMotionUpdates()
     }
     
-
-    func createBoxNode(_ x: Float, _ y: Float, _ z: Float) -> SCNNode {
-        let boxNode = SCNNode(geometry: boxGeo)
-        boxNode.position = SCNVector3(x, y, z)
-        boxNode.physicsBody = SCNPhysicsBody(type: .kinematic, shape: nil)
-        boxNode.physicsBody?.isAffectedByGravity = false
-        boxNode.name = "obstacle"
-        
-        boxNode.physicsBody?.categoryBitMask = PhysicsCategory.box
-        boxNode.physicsBody?.collisionBitMask = PhysicsCategory.player
-        boxNode.physicsBody?.contactTestBitMask = PhysicsCategory.player
-        
-        // Assign the material
-        boxNode.geometry?.materials = [redMat].compactMap { $0 }
-        
-        trackArray.append(boxNode)
-        return boxNode
-    }
-
-    func createSphereNode(_ x: Float, _ y: Float, _ z: Float) -> SCNNode {
-        let sphereNode = SCNNode(geometry: sphereGeo)
-        sphereNode.position = SCNVector3(x, y, z)
-        sphereNode.physicsBody = SCNPhysicsBody(type: .kinematic, shape: nil)
-        sphereNode.physicsBody?.isAffectedByGravity = false
-        sphereNode.name = "point"
-        
-        // Set category, collision, and contact masks
-        sphereNode.physicsBody?.categoryBitMask = PhysicsCategory.sphere
-        sphereNode.physicsBody?.collisionBitMask = PhysicsCategory.player
-        sphereNode.physicsBody?.contactTestBitMask = PhysicsCategory.player
-        
-        // Assign the material
-        sphereNode.geometry?.materials = [greenMat].compactMap { $0 }
-        
-        trackArray.append(sphereNode)
-        return sphereNode
-    }
-    
     func createPlaneNode(_ x: Float, _ y: Float, _ z: Float) -> SCNNode {
         let planeNode = SCNNode(geometry: planeGeo)
         planeNode.position = SCNVector3(x, y, z)
@@ -206,10 +173,12 @@ class GameScene: UIViewController, SCNPhysicsContactDelegate {
         planeNode.physicsBody?.collisionBitMask = PhysicsCategory.player
         planeNode.physicsBody?.contactTestBitMask = PhysicsCategory.player
         
+        let newPose = poseDetection.getRandomPose()
+        
         // todo add variants
-        if let maskImage = UIImage(named: "test.png") {
+        if let maskImage = UIImage(named: "arnoldMask.png") {
             let material = glassMat
-            material.diffuse.contents = maskImage
+//            material.diffuse.contents = maskImage
             material.transparent.contents = maskImage
             material.blendMode = .alpha
             material.transparencyMode = .rgbZero
@@ -222,7 +191,7 @@ class GameScene: UIViewController, SCNPhysicsContactDelegate {
         
         // Assign the material
         
-        
+        poseArray.append(newPose)
         trackArray.append(planeNode)
         return planeNode
     }
@@ -249,19 +218,22 @@ class GameScene: UIViewController, SCNPhysicsContactDelegate {
         }
         
         if (obj.physicsBody?.categoryBitMask == PhysicsCategory.box) {
-            // if (poseMatches) do stuff
-            // else
-//            triggerGameOver()
-//            return
+            if (/*poseDetection.isPoseMatchedBool*/ true) {
+                points += 1
+                updatePointLabel()
+                obj.physicsBody = nil
+                return
+            }
+            else {
+                triggerGameOver()
+            }
             
-            points += 1
-            updatePointLabel()
         }
         
-        obj.removeFromParentNode()
-        if let index = trackArray.firstIndex(of: obj) {
-            trackArray.remove(at: index)
-        }
+//        obj.removeFromParentNode()
+//        if let index = trackArray.firstIndex(of: obj) {
+//            trackArray.remove(at: index)
+//        }
         
         // Handle collision
         //print("Collision detected between \(nodeA.name ?? "NodeA") and \(nodeB.name ?? "NodeB")")
@@ -320,11 +292,11 @@ class GameScene: UIViewController, SCNPhysicsContactDelegate {
     
     func manageTrackObjects() {
         // Update the position of each object on the track
-        for node in self.trackArray {
+        for (index, node) in self.trackArray.enumerated() {
             node.position.z += moveAmount // Move forward towards camera
             //print("Updated Obstacle Position: (\(node.position.x), 0, \(node.position.z))")
             if (node.position.z >= zDeletePos) {
-                
+                poseArray.removeFirst() // this might be remove last actually
                 node.removeFromParentNode()
                 //print("Removed node")
             }
