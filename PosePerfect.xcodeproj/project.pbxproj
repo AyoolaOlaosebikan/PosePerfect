@@ -9,6 +9,10 @@
 /* Begin PBXBuildFile section */
 		8C111D0F2D10EEB40025E1F6 /* GameScene.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8C111D0E2D10EEB40025E1F6 /* GameScene.swift */; };
 		8C111D112D10EECC0025E1F6 /* SceneKit Scene.scn in Resources */ = {isa = PBXBuildFile; fileRef = 8C111D102D10EECC0025E1F6 /* SceneKit Scene.scn */; };
+		8C5E4BB82D1198F000206F34 /* brown_photostudio_03_4k.exr in Resources */ = {isa = PBXBuildFile; fileRef = 8C5E4BB72D1198F000206F34 /* brown_photostudio_03_4k.exr */; };
+		8C5E4BBA2D119A4300206F34 /* gym_01_4k.hdr in Resources */ = {isa = PBXBuildFile; fileRef = 8C5E4BB92D119A4300206F34 /* gym_01_4k.hdr */; };
+		8C5E4BBC2D119C0100206F34 /* seamless-grass-texture-free-thumb27.jpg.png in Resources */ = {isa = PBXBuildFile; fileRef = 8C5E4BBB2D119C0100206F34 /* seamless-grass-texture-free-thumb27.jpg.png */; };
+		8C5E4BBE2D119C8400206F34 /* gymmat.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 8C5E4BBD2D119C8400206F34 /* gymmat.jpg */; };
 		8CC189402D0A74EF0056286D /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8CC1893F2D0A74EF0056286D /* AppDelegate.swift */; };
 		8CC189422D0A74EF0056286D /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8CC189412D0A74EF0056286D /* SceneDelegate.swift */; };
 		8CC189442D0A74EF0056286D /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8CC189432D0A74EF0056286D /* ViewController.swift */; };
@@ -41,6 +45,10 @@
 /* Begin PBXFileReference section */
 		8C111D0E2D10EEB40025E1F6 /* GameScene.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameScene.swift; sourceTree = "<group>"; };
 		8C111D102D10EECC0025E1F6 /* SceneKit Scene.scn */ = {isa = PBXFileReference; lastKnownFileType = file.bplist; path = "SceneKit Scene.scn"; sourceTree = "<group>"; };
+		8C5E4BB72D1198F000206F34 /* brown_photostudio_03_4k.exr */ = {isa = PBXFileReference; lastKnownFileType = file; path = brown_photostudio_03_4k.exr; sourceTree = "<group>"; };
+		8C5E4BB92D119A4300206F34 /* gym_01_4k.hdr */ = {isa = PBXFileReference; lastKnownFileType = file; path = gym_01_4k.hdr; sourceTree = "<group>"; };
+		8C5E4BBB2D119C0100206F34 /* seamless-grass-texture-free-thumb27.jpg.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "seamless-grass-texture-free-thumb27.jpg.png"; sourceTree = "<group>"; };
+		8C5E4BBD2D119C8400206F34 /* gymmat.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; name = gymmat.jpg; path = ../../Pictures/gymmat.jpg; sourceTree = "<group>"; };
 		8CC1893C2D0A74EF0056286D /* PosePerfect.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = PosePerfect.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		8CC1893F2D0A74EF0056286D /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		8CC189412D0A74EF0056286D /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
@@ -86,6 +94,7 @@
 		8CC189332D0A74EF0056286D = {
 			isa = PBXGroup;
 			children = (
+				8C5E4BBD2D119C8400206F34 /* gymmat.jpg */,
 				8CC1893E2D0A74EF0056286D /* PosePerfect */,
 				8CC189552D0A74F10056286D /* PosePerfectTests */,
 				8CC1895F2D0A74F10056286D /* PosePerfectUITests */,
@@ -108,6 +117,7 @@
 			children = (
 				8C111D0E2D10EEB40025E1F6 /* GameScene.swift */,
 				8CC1896F2D0A7A230056286D /* PosePerfect.entitlements */,
+				8C5E4BB92D119A4300206F34 /* gym_01_4k.hdr */,
 				8CC1893F2D0A74EF0056286D /* AppDelegate.swift */,
 				8CC189412D0A74EF0056286D /* SceneDelegate.swift */,
 				8C111D102D10EECC0025E1F6 /* SceneKit Scene.scn */,
@@ -115,6 +125,8 @@
 				8CC189452D0A74EF0056286D /* Main.storyboard */,
 				8CFE06732D0CD1070086C2A3 /* GameViewController.swift */,
 				8CC189482D0A74F10056286D /* Assets.xcassets */,
+				8C5E4BB72D1198F000206F34 /* brown_photostudio_03_4k.exr */,
+				8C5E4BBB2D119C0100206F34 /* seamless-grass-texture-free-thumb27.jpg.png */,
 				8CC1894A2D0A74F10056286D /* LaunchScreen.storyboard */,
 				8CC1894D2D0A74F10056286D /* Info.plist */,
 			);
@@ -242,9 +254,13 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				8C5E4BBE2D119C8400206F34 /* gymmat.jpg in Resources */,
+				8C5E4BB82D1198F000206F34 /* brown_photostudio_03_4k.exr in Resources */,
+				8C5E4BBC2D119C0100206F34 /* seamless-grass-texture-free-thumb27.jpg.png in Resources */,
 				8C111D112D10EECC0025E1F6 /* SceneKit Scene.scn in Resources */,
 				8CC189492D0A74F10056286D /* Assets.xcassets in Resources */,
 				8CC1894C2D0A74F10056286D /* Base in Resources */,
+				8C5E4BBA2D119A4300206F34 /* gym_01_4k.hdr in Resources */,
 				8CC189472D0A74EF0056286D /* Base in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
