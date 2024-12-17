@@ -12,7 +12,6 @@
 		8C5E4BB82D1198F000206F34 /* brown_photostudio_03_4k.exr in Resources */ = {isa = PBXBuildFile; fileRef = 8C5E4BB72D1198F000206F34 /* brown_photostudio_03_4k.exr */; };
 		8C5E4BBA2D119A4300206F34 /* gym_01_4k.hdr in Resources */ = {isa = PBXBuildFile; fileRef = 8C5E4BB92D119A4300206F34 /* gym_01_4k.hdr */; };
 		8C5E4BBC2D119C0100206F34 /* seamless-grass-texture-free-thumb27.jpg.png in Resources */ = {isa = PBXBuildFile; fileRef = 8C5E4BBB2D119C0100206F34 /* seamless-grass-texture-free-thumb27.jpg.png */; };
-		8C5E4BBE2D119C8400206F34 /* gymmat.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 8C5E4BBD2D119C8400206F34 /* gymmat.jpg */; };
 		8CC189402D0A74EF0056286D /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8CC1893F2D0A74EF0056286D /* AppDelegate.swift */; };
 		8CC189422D0A74EF0056286D /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8CC189412D0A74EF0056286D /* SceneDelegate.swift */; };
 		8CC189442D0A74EF0056286D /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8CC189432D0A74EF0056286D /* ViewController.swift */; };
@@ -48,7 +47,6 @@
 		8C5E4BB72D1198F000206F34 /* brown_photostudio_03_4k.exr */ = {isa = PBXFileReference; lastKnownFileType = file; path = brown_photostudio_03_4k.exr; sourceTree = "<group>"; };
 		8C5E4BB92D119A4300206F34 /* gym_01_4k.hdr */ = {isa = PBXFileReference; lastKnownFileType = file; path = gym_01_4k.hdr; sourceTree = "<group>"; };
 		8C5E4BBB2D119C0100206F34 /* seamless-grass-texture-free-thumb27.jpg.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "seamless-grass-texture-free-thumb27.jpg.png"; sourceTree = "<group>"; };
-		8C5E4BBD2D119C8400206F34 /* gymmat.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; name = gymmat.jpg; path = ../../Pictures/gymmat.jpg; sourceTree = "<group>"; };
 		8CC1893C2D0A74EF0056286D /* PosePerfect.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = PosePerfect.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		8CC1893F2D0A74EF0056286D /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		8CC189412D0A74EF0056286D /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
@@ -94,7 +92,6 @@
 		8CC189332D0A74EF0056286D = {
 			isa = PBXGroup;
 			children = (
-				8C5E4BBD2D119C8400206F34 /* gymmat.jpg */,
 				8CC1893E2D0A74EF0056286D /* PosePerfect */,
 				8CC189552D0A74F10056286D /* PosePerfectTests */,
 				8CC1895F2D0A74F10056286D /* PosePerfectUITests */,
@@ -254,7 +251,6 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				8C5E4BBE2D119C8400206F34 /* gymmat.jpg in Resources */,
 				8C5E4BB82D1198F000206F34 /* brown_photostudio_03_4k.exr in Resources */,
 				8C5E4BBC2D119C0100206F34 /* seamless-grass-texture-free-thumb27.jpg.png in Resources */,
 				8C111D112D10EECC0025E1F6 /* SceneKit Scene.scn in Resources */,
@@ -473,7 +469,7 @@
 				CODE_SIGN_ENTITLEMENTS = PosePerfect/PosePerfect.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = MJXC97G8VT;
+				DEVELOPMENT_TEAM = 9NGW8KNW93;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = PosePerfect/Info.plist;
 				INFOPLIST_KEY_NSCameraUsageDescription = "Used to read camera input for the game to see poses";
@@ -487,7 +483,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = hi.PosePerfect;
+				PRODUCT_BUNDLE_IDENTIFIER = hi.PosePerfect2;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
@@ -503,7 +499,7 @@
 				CODE_SIGN_ENTITLEMENTS = PosePerfect/PosePerfect.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = MJXC97G8VT;
+				DEVELOPMENT_TEAM = 9NGW8KNW93;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = PosePerfect/Info.plist;
 				INFOPLIST_KEY_NSCameraUsageDescription = "Used to read camera input for the game to see poses";
@@ -517,7 +513,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = hi.PosePerfect;
+				PRODUCT_BUNDLE_IDENTIFIER = hi.PosePerfect2;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;

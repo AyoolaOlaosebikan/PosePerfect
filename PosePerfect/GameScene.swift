@@ -66,10 +66,10 @@ class GameScene: UIViewController, SCNPhysicsContactDelegate, AVCaptureVideoData
     var isPoseMatchedBool: Bool = false
 
     let targetPoses: [String: [String: Double]] = [
-        "front_biceps": ["LeftArmAngle": -150, "RightArmAngle": 150],
+        "bicep": ["LeftArmAngle": -150, "RightArmAngle": 150],
         "arnold": ["LeftArmAngle": -20, "RightArmAngle": 150],
-        "side_chest": ["LeftArmAngle": -60, "RightArmAngle": 100],
-        "side_tricep": ["LeftArmAngle": 15],
+        "chest": ["LeftArmAngle": -60, "RightArmAngle": 100],
+        "tricep": ["LeftArmAngle": 15],
     ]
 
     var currentPoseObservation: VNHumanBodyPoseObservation?
@@ -77,7 +77,7 @@ class GameScene: UIViewController, SCNPhysicsContactDelegate, AVCaptureVideoData
     let bodyPoseRequest = VNDetectHumanBodyPoseRequest()
 
     var previousPoseKey: String?
-    var currentPoseKey: String = "front_biceps"
+    var currentPoseKey: String = "bicep"
 
     func updatePointLabel() {
         DispatchQueue.main.async { [weak self] in
@@ -296,10 +296,10 @@ class GameScene: UIViewController, SCNPhysicsContactDelegate, AVCaptureVideoData
 //        currentPoseKey = randomPoseKey // Update currentPoseKey for consistency
 
         // Use the selected pose key to fetch the corresponding cutout image
-        let imageName = "\(randomPoseKey).png"
+        let imageName = "\(randomPoseKey)Mask.png"
         if let maskImage = UIImage(named: imageName) {
             let material = glassMat
-            material.diffuse.contents = maskImage
+//            material.diffuse.contents = maskImage
             material.transparent.contents = maskImage
             material.blendMode = .alpha
             material.transparencyMode = .rgbZero
@@ -412,7 +412,7 @@ class GameScene: UIViewController, SCNPhysicsContactDelegate, AVCaptureVideoData
     var lastObstacleSpawnTime: Double = 0
 
     func generateTrackObject() {
-        let randomPoseKey = targetPoses.keys.randomElement() ?? "front_biceps"
+        let randomPoseKey = targetPoses.keys.randomElement() ?? "bicep"
         currentPoseKey = randomPoseKey // Update currentPoseKey for consistency
         let planeNode = createPlaneNode(0, planeWidth / 2, spawnDist, randomPoseKey: randomPoseKey)
         scene.rootNode.addChildNode(planeNode)
