@@ -20,9 +20,9 @@ class GameViewController: UIViewController, AVCaptureVideoDataOutputSampleBuffer
 
     let targetPoses: [String: [String: Double]] = [
         "front_biceps": ["LeftArmAngle": -150, "RightArmAngle": 150],
-        "arnold": ["LeftArmAngle": 0, "RightArmAngle": 120],
-        "side_chest": ["LeftArmAngle": 110, "RightArmAngle": 110],
-        "side_tricep": ["LeftArmAngle": 90, "RightArmAngle": 50],
+        "arnold": ["LeftArmAngle": -20, "RightArmAngle": 150],
+        "side_chest": ["LeftArmAngle": -60, "RightArmAngle": 100],
+        "side_tricep": ["LeftArmAngle": 15],
     ]
 
     var currentPoseObservation: VNHumanBodyPoseObservation?
@@ -196,7 +196,7 @@ class GameViewController: UIViewController, AVCaptureVideoDataOutputSampleBuffer
         for (key, targetValue) in targetPose {
             if let detectedValue = detectedFeatures[key] {
                 print("\(key) and \(detectedValue) and \(targetValue)")
-                if abs(detectedValue - targetValue) > 10 { // Allow a margin of error
+                if abs(detectedValue - targetValue) > 30 { // Allow a margin of error
                     return false
                 }
             }
