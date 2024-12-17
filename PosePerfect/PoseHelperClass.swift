@@ -15,10 +15,10 @@ class PoseHelper : NSObject, AVCaptureVideoDataOutputSampleBufferDelegate {
     var captureSession: AVCaptureSession!
 
     let targetPoses: [String: [String: Double]] = [
-        "front_biceps": ["LeftArmAngle": -150, "RightArmAngle": 150],
+        "bicep": ["LeftArmAngle": -150, "RightArmAngle": 150],
         "arnold": ["LeftArmAngle": 0, "RightArmAngle": 120],
-        "side_chest": ["LeftArmAngle": 110, "RightArmAngle": 110],
-        "side_tricep": ["LeftArmAngle": 90, "RightArmAngle": 50],
+        "chest": ["LeftArmAngle": 110, "RightArmAngle": 110],
+        "tricep": ["LeftArmAngle": 90, "RightArmAngle": 50],
     ]
 
     var currentPoseObservation: VNHumanBodyPoseObservation?
@@ -26,7 +26,7 @@ class PoseHelper : NSObject, AVCaptureVideoDataOutputSampleBufferDelegate {
     let bodyPoseRequest = VNDetectHumanBodyPoseRequest()
     
     var previousPoseKey: String?
-    var currentPoseKey: String = "front_biceps"
+    var currentPoseKey: String = "bicep"
     
     func start() {
         setupCamera()
@@ -69,11 +69,11 @@ class PoseHelper : NSObject, AVCaptureVideoDataOutputSampleBufferDelegate {
     }
 
     func checkPose(targetPose: [String : Double]) -> Bool {
-        guard let currentPoseObservation = currentPoseObservation else {
-//            print("No pose detected.")
-            return false;
-        }
-        let detectedFeatures = extractFeatures(from: currentPoseObservation)
+//        guard let currentPoseObservation = currentPoseObservation else {
+////            print("No pose detected.")
+//            return false;
+//        }
+        let detectedFeatures = extractFeatures(from: )
         
         return isPoseMatched(detectedFeatures: detectedFeatures, targetPose: targetPose)
     }
@@ -100,10 +100,10 @@ class PoseHelper : NSObject, AVCaptureVideoDataOutputSampleBufferDelegate {
     }
 
     // Pose has random chance to get any pose that wasnt the last one
-    func getRandomPose() -> [String : Double] {
+    func getRandomPose() -> String {
         var newPoseKey: String
         repeat {
-            newPoseKey = targetPoses.keys.randomElement() ?? "front_biceps"
+            newPoseKey = targetPoses.keys.randomElement() ?? "bicep"
         } while newPoseKey == previousPoseKey
 
         let newPose = targetPoses[newPoseKey]
@@ -116,7 +116,7 @@ class PoseHelper : NSObject, AVCaptureVideoDataOutputSampleBufferDelegate {
             isPoseMatchedBool = false // Reset pose matching state
         }
         
-        return newPose!
+        return currentPoseKey
     }
 }
 
@@ -136,6 +136,7 @@ extension PoseHelper {
                 if let results = self.bodyPoseRequest.results, let firstPose = results.first {
                     DispatchQueue.main.async {
                         self.currentPoseObservation = firstPose
+                        print(firstPose)
                         self.analyzePose(from: firstPose)
                     }
                 } else {

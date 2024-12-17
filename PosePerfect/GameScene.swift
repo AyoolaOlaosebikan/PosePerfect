@@ -22,7 +22,7 @@ class GameScene: UIViewController, SCNPhysicsContactDelegate {
     let motionManager = CMMotionManager()
     
     var trackArray: [SCNNode] = []
-    var poseArray: [[String : Double]] = []
+    var poseArray: [String] = []
     
     let boxGeo = SCNBox(width: 1.0, height: 1.0, length: 1.0, chamferRadius: 0.0)
     let sphereGeo = SCNSphere(radius: 0.5)
@@ -57,6 +57,8 @@ class GameScene: UIViewController, SCNPhysicsContactDelegate {
     let tutorialShown: Bool = false
     
     let poseDetection: PoseHelper = PoseHelper()
+    
+    var matDict: [String : SCNMaterial] = [:]
     
     func updatePointLabel() {
         DispatchQueue.main.async { [weak self] in
@@ -147,11 +149,11 @@ class GameScene: UIViewController, SCNPhysicsContactDelegate {
         glassMat = glassNode?.geometry?.materials[0] ?? glassMat
         
         // Create a box
-        let planeNode = createPlaneNode(0, planeWidth/2, spawnDist)
-        scene.rootNode.addChildNode(planeNode)
-        trackArray.append(planeNode)
-        
-        print("Obstacle Array Count: \(self.trackArray.count)")
+//        let planeNode = createPlaneNode(0, planeWidth/2, spawnDist)
+//        scene.rootNode.addChildNode(planeNode)
+//        
+//        
+//        print("Obstacle Array Count: \(self.trackArray.count)")
         if let playerNode = self.playerNode {
             print("Player Node Position: \(playerNode.position)")
         } else {
@@ -162,7 +164,7 @@ class GameScene: UIViewController, SCNPhysicsContactDelegate {
     }
     
     func createPlaneNode(_ x: Float, _ y: Float, _ z: Float) -> SCNNode {
-        let planeNode = SCNNode(geometry: planeGeo)
+        let planeNode = SCNNode(geometry: SCNPlane(width: CGFloat(planeWidth), height: CGFloat(planeWidth)))
         planeNode.position = SCNVector3(x, y, z)
         planeNode.rotation = SCNVector4(0.0, 90.0, 0.0, 0.0)
         planeNode.physicsBody = SCNPhysicsBody(type: .kinematic, shape: nil)
@@ -173,25 +175,23 @@ class GameScene: UIViewController, SCNPhysicsContactDelegate {
         planeNode.physicsBody?.collisionBitMask = PhysicsCategory.player
         planeNode.physicsBody?.contactTestBitMask = PhysicsCategory.player
         
-        let newPose = poseDetection.getRandomPose()
+        var poseName: String = poseDetection.getRandomPose() //fallback value
         
-        // todo add variants
-        if let maskImage = UIImage(named: "arnoldMask.png") {
-            let material = glassMat
-//            material.diffuse.contents = maskImage
-            material.transparent.contents = maskImage
-            material.blendMode = .alpha
-            material.transparencyMode = .rgbZero
-            
-            // Apply the material to the plane
-            planeNode.geometry?.materials = [material].compactMap { $0 }
-        } else {
-            planeNode.geometry?.materials = [glassMat].compactMap { $0 }
+        var material = matDict[poseName]
+        if material == nil {
+            material = glassMat.copy() as? SCNMaterial
+            let maskImage = UIImage(named: poseName + "Mask.png")
+            material!.transparent.contents = maskImage
+            material!.blendMode = .alpha
+            material!.transparencyMode = .rgbZero
+            matDict[poseName] = material
         }
         
-        // Assign the material
+        print("Pose changed to " + poseName)
         
-        poseArray.append(newPose)
+        planeNode.geometry?.materials = [material].compactMap { $0 }
+        
+        poseArray.append(poseName)
         trackArray.append(planeNode)
         return planeNode
     }
@@ -218,7 +218,12 @@ class GameScene: UIViewController, SCNPhysicsContactDelegate {
         }
         
         if (obj.physicsBody?.categoryBitMask == PhysicsCategory.box) {
-            if (/*poseDetection.isPoseMatchedBool*/ true) {
+            print("collision detected")
+            let poseName = poseArray.first!
+            let poseData = poseDetection.targetPoses[poseName]!
+            print("checking pose: ", poseName)
+            print(poseData)
+            if (poseDetection.checkPose(targetPose: poseData)) {
                 points += 1
                 updatePointLabel()
                 obj.physicsBody = nil
@@ -278,7 +283,6 @@ class GameScene: UIViewController, SCNPhysicsContactDelegate {
             moveAmount += moveAmountChange
             print ("Move Amount is now \(moveAmount)")
 
-            // Check if enough time has passed to spawn an obstacle
             if time - lastObstacleSpawnTime >= obstacleSpawnTime {
                 lastObstacleSpawnTime = time // Update last spawn time
                 let planeNode = createPlaneNode(0.0, planeWidth/2, spawnDist)
@@ -292,11 +296,11 @@ class GameScene: UIViewController, SCNPhysicsContactDelegate {
     
     func manageTrackObjects() {
         // Update the position of each object on the track
-        for (index, node) in self.trackArray.enumerated() {
+        for (_, node) in self.trackArray.enumerated() {
             node.position.z += moveAmount // Move forward towards camera
             //print("Updated Obstacle Position: (\(node.position.x), 0, \(node.position.z))")
             if (node.position.z >= zDeletePos) {
-                poseArray.removeFirst() // this might be remove last actually
+                if (!poseArray.isEmpty) {poseArray.removeFirst()} // this might be remove last actually
                 node.removeFromParentNode()
                 //print("Removed node")
             }
