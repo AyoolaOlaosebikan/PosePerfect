@@ -84,30 +84,37 @@
                                 <rect key="frame" x="-3" y="0.0" width="409" height="852"/>
                                 <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                             </view>
-                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" ambiguous="YES" text="Label" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="aXY-Qv-hrv">
-                                <rect key="frame" x="70" y="699" width="246" height="36"/>
-                                <fontDescription key="fontDescription" type="system" pointSize="30"/>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="aXY-Qv-hrv">
+                                <rect key="frame" x="70" y="705" width="246" height="30"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="25"/>
                                 <color key="textColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 <nil key="highlightedColor"/>
                             </label>
-                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="wTb-yQ-yOu">
-                                <rect key="frame" x="37" y="756" width="68" height="35"/>
-                                <state key="normal" title="Button"/>
-                                <buttonConfiguration key="configuration" style="filled" title="Reset"/>
-                            </button>
                             <sceneKitView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" id="19f-Lq-N6c">
                                 <rect key="frame" x="0.0" y="58" width="393" height="648"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                             </sceneKitView>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="center" lineBreakMode="tailTruncation" numberOfLines="3" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="byU-lo-0y1">
+                                <rect key="frame" x="174" y="759" width="204" height="52"/>
+                                <constraints>
+                                    <constraint firstAttribute="width" constant="204" id="5Po-xQ-vTh"/>
+                                </constraints>
+                                <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                <color key="textColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                <nil key="highlightedColor"/>
+                            </label>
                         </subviews>
                         <viewLayoutGuide key="safeArea" id="AD8-0w-eTX"/>
                         <constraints>
                             <constraint firstItem="Qkk-lV-pDR" firstAttribute="leading" secondItem="spp-My-bkd" secondAttribute="leadingMargin" constant="-19" id="3G0-9H-Bx3"/>
-                            <constraint firstItem="wTb-yQ-yOu" firstAttribute="leading" secondItem="AD8-0w-eTX" secondAttribute="leading" constant="37" id="6Wo-yU-3wY"/>
-                            <constraint firstItem="AD8-0w-eTX" firstAttribute="bottom" secondItem="wTb-yQ-yOu" secondAttribute="bottom" constant="27" id="T0M-EH-r8N"/>
+                            <constraint firstItem="aXY-Qv-hrv" firstAttribute="leading" secondItem="AD8-0w-eTX" secondAttribute="leading" constant="70" id="7yu-cR-z7L"/>
+                            <constraint firstItem="byU-lo-0y1" firstAttribute="top" secondItem="aXY-Qv-hrv" secondAttribute="bottom" constant="24" id="Gv4-zu-D4x"/>
+                            <constraint firstItem="AD8-0w-eTX" firstAttribute="bottom" secondItem="byU-lo-0y1" secondAttribute="bottom" constant="7" id="RFW-t3-6AD"/>
                             <constraint firstAttribute="trailingMargin" secondItem="Qkk-lV-pDR" secondAttribute="trailing" constant="-29" id="f0T-7K-kSW"/>
                             <constraint firstItem="Qkk-lV-pDR" firstAttribute="centerY" secondItem="spp-My-bkd" secondAttribute="centerY" id="gjD-QL-Gap"/>
+                            <constraint firstItem="AD8-0w-eTX" firstAttribute="trailing" secondItem="aXY-Qv-hrv" secondAttribute="trailing" constant="77" id="q67-YH-p5I"/>
                             <constraint firstAttribute="bottomMargin" secondItem="Qkk-lV-pDR" secondAttribute="bottom" constant="-34" id="sIV-Ub-fxE"/>
+                            <constraint firstItem="byU-lo-0y1" firstAttribute="leading" secondItem="AD8-0w-eTX" secondAttribute="leading" constant="174" id="tGM-RE-Ya0"/>
                             <constraint firstItem="AD8-0w-eTX" firstAttribute="bottom" secondItem="aXY-Qv-hrv" secondAttribute="bottom" constant="83" id="yVa-Us-g4G"/>
                         </constraints>
                     </view>
@@ -115,6 +122,7 @@
                     <connections>
                         <outlet property="cameraBackgroundView" destination="Qkk-lV-pDR" id="LgB-dP-JP6"/>
                         <outlet property="infoLabel" destination="aXY-Qv-hrv" id="tLB-mz-PnZ"/>
+                        <outlet property="poseDetectionLabel" destination="byU-lo-0y1" id="RRy-OW-d8I"/>
                         <outlet property="sceneView" destination="19f-Lq-N6c" id="weT-Mx-1jO"/>
                     </connections>
                 </viewController>
